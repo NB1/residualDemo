@@ -1,0 +1,63 @@
+---
+title: "residualDemo"
+author: "Neeraj Bhatnagar"
+date: "6/29/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Purpose
+
+We will show that residuals in a linear regression can be correlated with an explanatory variable.  y is a function of two explanatory variables x1 and x2.
+
+```{r residualDemo}
+set.seed(0)
+x1 <- runif(100)
+x2 <- runif(100)
+y <- 2 * x1 + x2^2 + 1 #intentionally making the data non-linear to rule out a perfect fit
+```
+
+
+## Allow an intercept in linear regression
+When the intercept is allowed, the correlations between residuals and explanatory variables will be zero.
+
+```{r interceptAllowed}
+df <- as.data.frame(cbind(x1, x2, y))
+lm <- lm(y~x1+x2, data=df)
+df$y_hat <- predict(lm, df) 
+df$residuals <- df$y - df$y_hat
+cor1 = cor(df$residuals, df$x1)
+cor2 = cor(df$residuals, df$x2)
+sum_residual = sum(df$residuals)
+
+head(df)
+```
+
+Correlation coefficients between the residuals and x1 and x2 respectively are `r cor1` and 
+`r cor2`.  
+The sum of all residuals is `r sum_residual`.  All of these values are close to 0.0.
+
+
+Now we will see what happens when we do not allow an intercept in the linear fit.
+
+## Don't allow the intercept in linear regression (use the same data)
+
+```{r interceptNotAllowed}
+df <- as.data.frame(cbind(x1, x2, y))
+lm <- lm(y~x1+x2+0, data=df)#adding the 0 in the fit forces that there is no intercept.
+df$y_hat <- predict(lm, df) 
+df$residuals <- df$y - df$y_hat
+cor1 = cor(df$residuals, df$x1)
+cor2 = cor(df$residuals, df$x2)
+sum_residual = sum(df$residuals)
+
+head(df)
+```
+
+When we force the intercept to be 0, the correlation coefficients between the residuals and x1 and x2 respectively are `r cor1` and 
+`r cor2`.  
+The sum of all residuals is `r sum_residual`.  None of these values is 0.0.
+
